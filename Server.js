@@ -60,6 +60,29 @@ app.post("/signup", async (req, res) => {
     }})
   })
 
+
+app.post("/login", async (req, res) => {
+    const mail = req.body.email;
+    const pass = req.body.password;
+
+    const user = await UserModel.findOne({ "email": mail })
+        .then((data) => {
+            if (data) {
+                if (data.password === pass) {
+                    res.status(200).json({ message: "Login successful." });
+                } else {
+                    res.status(401).json({ error: "Password is incorrect." });
+                }
+            } else {
+                res.status(401).json({ error: "Email doesn't match." });
+            }
+        })
+        .catch(error => {
+            console.error('Error Finding User: ', error);
+            res.status(500).json({ error: "An error occurred. Please try again later." });
+        });
+});
+
 app.listen(PORT, ()=>{
     console.log(`Listening on port ${PORT}...`)
 })
