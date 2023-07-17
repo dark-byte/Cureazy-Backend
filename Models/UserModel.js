@@ -29,11 +29,9 @@ const userModel = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true
   },
   phoneNumber: {
     type: String,
-    unique: true,
     trim: true
   },
   password: {

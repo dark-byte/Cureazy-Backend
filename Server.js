@@ -41,7 +41,7 @@ app.post("/signup", async (req, res) => {
         //Acount exists
             res.status(400).json({ error: "Account already exists!" });
             console.log("User Exists")
-            console.log(`User Exists: \n${isEmail? `Email: ${mail}`: `Phone Number: ${ph}`}`)
+            console.log(`User Exists: \n${emailExists? `Email: ${mail}`: `Phone Number: ${ph}`}`)
     }else{
         const newClient = new UserModel({
                 firstName: fName,
@@ -51,8 +51,8 @@ app.post("/signup", async (req, res) => {
                 weight: 0,
                 address: add,
                 pincode: pin,
-                email: mail === "" ? null: mail,
-                phoneNumber: ph === "" ? null : ph,
+                email: mail === "" ? "": mail,
+                phoneNumber: ph === "" ? "" : ph,
                 password: pass
             });
             newClient.save()
