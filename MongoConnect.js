@@ -3,7 +3,6 @@ const UserModel = require('./Models/UserModel')
 const dotenv = require('dotenv').config()
 
 const MONGO_URL = process.env.MONGO_URL
-console.log(MONGO_URL)
 
 const connect = async ()=>{
     
