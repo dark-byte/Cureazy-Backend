@@ -15,6 +15,11 @@ app.get('/', (req, res)=>{
     res.send({"msg": "Connection Successful!"})
 })
 
+app.get("/clinic/:id", (req, res)=>{
+    res.send("Request received for id" + req.params.id)
+    console.log(`Request for clinic - ${req.params.id}`)
+});
+
 app.post("/signup", async (req, res) => {
     console.log(req.body)
     const fName = req.body.fName;
@@ -67,7 +72,6 @@ app.post("/signup", async (req, res) => {
     }
 })
 
-
 app.post("/login", async (req, res) => {
     const mail = req.body.email;
     const pass = req.body.password;
@@ -90,6 +94,7 @@ app.post("/login", async (req, res) => {
             res.status(500).json({ error: "An error occurred. Please try again later." });
         });
 });
+
 
 app.listen(PORT, ()=>{
     console.log(`Listening on port ${PORT}...`)
