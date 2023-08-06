@@ -5,9 +5,9 @@ const cors = require('cors')
 const dotenv = require('dotenv').config()
 const db = require('./MongoConnect')
 const helmet = require('helmet')
-const {signup, login} = require('./Controllers/UserController')
+const {signup, login, getUser} = require('./Controllers/UserController')
 const UserModel = require('./Models/UserModel')
-const { signup } = require('./Controllers/UserController')
+const auth = require('./Middleware/AuthMW')
 
 //Dummy Commit
 
@@ -32,6 +32,7 @@ app.post("/signup", signup)
 
 app.post("/login", login);
 
+app.get("/user", auth, getUser)
 
 https.createServer({
     key: fs.readFileSync('key.pem'),

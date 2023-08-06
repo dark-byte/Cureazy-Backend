@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const UserModel = require('../Models/UserModel')
+const jtw = require('jsonwebtoken')
 
 const signup = async (req, res)=>{
    console.log(req.body)
@@ -15,7 +16,7 @@ const signup = async (req, res)=>{
     var emailExists = false
     var phExists = false
 
-    if(ph === ""){
+    if(ph === "" || (ph != "" && mail != "")){
         emailExists = await UserModel.findOne({ "email": mail })
         //isEmail is only used to check if account with given email exists when ph is empty string - ""
     } else if(mail === ""){
@@ -44,7 +45,9 @@ const signup = async (req, res)=>{
             newClient.save()
                 .then(savedUser => {
                     console.log('New Client Added:', savedUser);
-                    res.status(200).json({ message: "Signup successful." });
+                    res.status(200).json({ message: "Signup successful.",
+                    token: generateJWTToken(savedUser._id) 
+                });
                 })
                 .catch(error => {
                     console.error('Error Creating Client: ', error);
@@ -57,12 +60,15 @@ const login = async(req, res)=>{
     const mail = req.body.email;
     const pass = req.body.password;
 
-    const user = await UserModel.findOne({ "email": mail })
+    await UserModel.findOne({ "email": mail })
         .then((data) => {
             if (data) {
                 if (data.password === pass) {
                     console.log(`User ${data.email} logged in`)
-                    res.status(200).json({ message: "Login successful!" });
+                    res.status(200).json({ 
+                        message: "Login successful!",
+                        token: generateJWTToken(data._id)
+                    })
                 } else {
                     res.status(400).json({ error: "Password is incorrect!" });
                 }
@@ -74,6 +80,16 @@ const login = async(req, res)=>{
             console.error('Error Finding User: ', error);
             res.status(500).json({ error: "An error occurred. Please try again later." });
         });
+}
+
+const getUser = async(req, res)=>{
+    const user = UserModel.findById()
+}
+
+const generateJWTToken = (id)=>{
+    return jtw.sign({id}, process.env.JWT_SECRET, {
+        expiresIn: '30d'
+    })
 }
 
 module.exports = { signup, login } 
