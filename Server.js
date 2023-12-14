@@ -227,10 +227,6 @@ app.post('/add-clinic', async (req, res) => {
     }
 });
 
-
-https.createServer({
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-}, app).listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}...`)
 })
