@@ -9,19 +9,31 @@ const { signup, login, getUser } = require('./Controllers/UserController')
 const UserModel = require('./Models/UserModel')
 const DoctorModel = require('./Models/DoctorModel')
 const ClinicModel = require('./Models/ClinicModel')
-const auth = require('./Middleware/AuthMW')
-
 const sgMail = require('@sendgrid/mail');
+const auth = require('./Middleware/AuthMW')
+const { profile } = require('console')
+const { uploadProfilePic } = require('./Middleware/UploadProfilePic')
+const multer = require('multer');
 
-//Dummy Commit
 
 const app = express()
+
+const storage = multer.memoryStorage(); // You can also use diskStorage if you want to save files to disk
+const upload = multer({ storage: storage });
+
+app.use(express.urlencoded({ extended: true })); // Parse application/x-www-form-urlencoded requests
+app.use(upload.any()); // Use multer to handle multipart/form-data
+
+
+// ******* MIDDLEWARES ********
 app.use(express.json())
 app.use(cors())
+app.use(helmet())
 
 const PORT = process.env.PORT || 9000
 
-app.use(helmet())
+
+// ************ API ENDPOINTS ************ 
 
 app.get('/', (req, res) => {
     res.send({ "msg": "Connection Successful!" })
@@ -102,6 +114,7 @@ app.post("/login/google", async (req, res) => {
 
 
 app.post("/add-doctor", async (req, res) => {
+
     console.log("Request body:", req.body);
     const { name, qualification, yearsOfExperience, description, phoneNumber } = req.body;
 
@@ -114,12 +127,19 @@ app.post("/add-doctor", async (req, res) => {
         return res.status(400).json({ error: "Doctor already exists." });
     }
 
+    var secureUrl = ""
+
+    if(req.body.profilePic){
+        secureUrl = await uploadProfilePic(req.body.profilePic)
+    }
+
     const newDoctor = new DoctorModel({
-        name,
-        qualification,
-        yearsOfExperience,
-        description,
-        phoneNumber
+        profilePic: secureUrl,
+        name: name,
+        qualification: qualification,
+        yearsOfExperience: yearsOfExperience,
+        description: description,
+        phoneNumber: phoneNumber
     });
 
     try {
@@ -127,13 +147,11 @@ app.post("/add-doctor", async (req, res) => {
         console.log("New doctor added:", newDoctor);
         return res.status(200).json({ message: "Doctor added successfully." });
     } catch (error) {
-        console.error("Error adding doctor:", error);
-        return res.status(500).json({ error: "An error occurred. Please try again later." });
+            console.error("Error adding doctor:", error);
+            return res.status(500).json({ error: "An error occurred. Please try again later." });
     }
 });
 
-// CDN
-// PUSH to git
 
 const isValidUrl = url => {
     try {
