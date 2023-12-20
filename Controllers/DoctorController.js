@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
 const DoctorModel = require('../Models/DoctorModel')
+const uploadProfilePic = require('../Middleware/UploadProfilePic')
 
 const addDoctor = async (req, res) => {
     console.log("Request body:", req.body);
@@ -14,12 +14,19 @@ const addDoctor = async (req, res) => {
         return res.status(400).json({ error: "Doctor already exists." });
     }
 
+    var secureUrl = ""
+
+    if(req.body.profilePic){
+        secureUrl = await uploadProfilePic(req.body.profilePic)
+    }
+
     const newDoctor = new DoctorModel({
-        name,
-        qualification,
-        yearsOfExperience,
-        description,
-        phoneNumber
+        profilePic: secureUrl,
+        name: name,
+        qualification: qualification,
+        yearsOfExperience: yearsOfExperience,
+        description: description,
+        phoneNumber: phoneNumber
     });
 
     try {
@@ -27,8 +34,8 @@ const addDoctor = async (req, res) => {
         console.log("New doctor added:", newDoctor);
         return res.status(200).json({ message: "Doctor added successfully." });
     } catch (error) {
-        console.error("Error adding doctor:", error);
-        return res.status(500).json({ error: "An error occurred. Please try again later." });
+            console.error("Error adding doctor:", error);
+            return res.status(500).json({ error: "An error occurred. Please try again later." });
     }
 }
 
