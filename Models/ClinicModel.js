@@ -9,6 +9,10 @@ const clinicSchema = new mongoose.Schema({
     address: {
         type: String
     },
+    PIN: {
+        type: String,
+        required: true
+    },
     directionUrl: {
         type: String,
         required: true
