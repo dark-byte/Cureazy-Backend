@@ -117,58 +117,69 @@ const displayClinics = async (req, res) => {
 
 const displayBySpecialists = async (req, res) => {
     try {
-        const { specialist } = req.query;
-
-        const limit = 16;
-
-        const trimmedSpecialist = specialist ? specialist.trim().toLowerCase() : '';
-
-        let query = {};
-        if (trimmedSpecialist) {
-            query = { specialists: { $in: [new RegExp(trimmedSpecialist, "i")] } };
+      const { specialist } = req.query;
+  
+      const limit = 16;
+  
+      const trimmedSpecialist = specialist?.trim().toLowerCase();
+  
+      const query = {
+        specialists: {
+          $regex: new RegExp(trimmedSpecialist, "i") 
         }
-
-        const clinics = await ClinicModel.find(query)
-            .sort({ clinicName: 1 })
-            .limit(limit);
-
-        if (clinics.length) {
-            return res.status(200).send({ clinics });
+      };
+  
+      const clinics = await ClinicModel.find(query)
+        .sort({ clinicName: 1 })
+        .limit(limit);
+  
+      if (clinics.length) {
+        return res.status(200).send({ clinics });
+      } else {
+        if (specialist) {
+          return res.status(404).send({ message: `No clinics found matching '${specialist}'. Please try different keywords or broaden your search.` });
         } else {
-            if (specialist) {
-                return res.status(404).send({ message: `No clinics found with specialist '${specialist}'.` });
-            } else {
-                return res.status(404).send({ message: 'No clinics found.' });
-            }
+          return res.status(404).send({ message: 'No clinics found.' });
         }
+      }
     } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: 'An internal server error occurred.' });
+      console.error(error);
+      res.status(500).send({ message: 'An internal server error occurred.' });
     }
-}
+  };
+  
 
-const displayByLocality = async (req, res) => {
+  const displayByLocality = async (req, res) => {
     try {
-        const { pin } = req.query;
-
-        const limit = 16;
-
-        const query = pin ? { PIN: { $regex: new RegExp(pin, "i") } } : {};
-
-        const clinics = await ClinicModel.find(query)
-            .sort({ clinicName: 1 })
-            .limit(limit);
-
-        if (clinics.length) {
-            return res.status(200).send({ clinics });
-        } else {
-            return res.status(404).send({ message: `No clinics found with PIN '${pin}'.` });
-        }
+      const { pin, address } = req.query;
+  
+      const limit = 16;
+  
+      const query = {};
+  
+      if (pin) {
+        query.PIN = { $regex: new RegExp(pin, "i") }; 
+      }
+  
+      if (address) {
+        query.address = { $regex: new RegExp(address, "i") }; 
+      }
+  
+      const clinics = await ClinicModel.find(query)
+        .sort({ clinicName: 1 })
+        .limit(limit);
+  
+      if (clinics.length) {
+        return res.status(200).send({ clinics });
+      } else {
+        return res.status(404).send({ message: `No clinics found matching the provided information.` });
+      }
     } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: 'An internal server error occurred.' });
+      console.error(error);
+      res.status(500).send({ message: 'An internal server error occurred.' });
     }
-}
+  };
+  
 
 module.exports = { addClinic, displayClinics, displayBySpecialists, displayByLocality }
 
