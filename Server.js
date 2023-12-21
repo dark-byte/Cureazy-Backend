@@ -9,8 +9,9 @@ const multer = require('multer');
 
 // CONTROLLERS
 const { signup, login, signupGoogle, loginGoogle } = require('./Controllers/UserController')
-const { addDoctor }  = require('./Controllers/DoctorController')
-const { addClinic } = require('./Controllers/ClinicController')
+const { addDoctor } = require('./Controllers/DoctorController')
+const { addClinic, displayClinics, displayBySpecialists, displayByLocality } = require('./Controllers/ClinicController')
+
 
 // OBJECT CREATIONS
 const app = express()
@@ -55,6 +56,11 @@ app.post("/add-doctor", addDoctor);
 
 app.post('/add-clinic', addClinic);
 
+app.get('/clinics', displayClinics);
+
+app.get('/clinics/specialists', displayBySpecialists);
+
+app.get('/clinics/locality', displayByLocality);
 
 // STARTING SERVER
 
