@@ -35,7 +35,18 @@ const doctorSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
-  }
+  },
+  specialization: {
+    type: String,
+    required: true
+  },
+  clinicIds: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ClinicModel',
+      required: true
+    }
+  ]
 });
 
 const DoctorModel = mongoose.model('DoctorModel', doctorSchema);
